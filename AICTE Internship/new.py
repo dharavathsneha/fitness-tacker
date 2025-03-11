@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 # ✅ Set Page Configuration
 st.set_page_config(page_title="Personal Fitness Tracker", page_icon="🏋️", layout="wide")
 
-# ✅ Set Background Image
+# ✅ Set Background Image Function
 def set_background(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as file:
@@ -27,7 +27,7 @@ def set_background(image_path):
         """
         st.markdown(css, unsafe_allow_html=True)
 
-# ✅ Correct path for the background image
+# ✅ Background Image Path
 background_image = "AICTE Internship/fitness_tracker_background.png"
 if os.path.exists(background_image):
     set_background(background_image)
@@ -37,20 +37,23 @@ file_path = "fitness_tracker_dataset.csv"
 df = None
 model = None  
 
-try:
-    df = pd.read_csv(file_path, encoding="latin-1", on_bad_lines="skip")
-    df.columns = df.columns.str.strip()
-    df = df.dropna()
-    
-    # ✅ Model Training
-    X = df[['Age', 'Weight_kg', 'Height_cm', 'Daily_Steps']]
-    y = df['Calories_Burned']
+if os.path.exists(file_path):
+    try:
+        df = pd.read_csv(file_path, encoding="latin-1", on_bad_lines="skip")
+        df.columns = df.columns.str.strip()
+        df = df.dropna()
+        
+        # ✅ Model Training
+        X = df[['Age', 'Weight_kg', 'Height_cm', 'Daily_Steps']]
+        y = df['Calories_Burned']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = RandomForestRegressor(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
-except Exception as e:
-    st.error(f"⚠️ Error loading dataset: {e}")
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+    except Exception as e:
+        st.error(f"⚠️ Error loading dataset: {e}")
+else:
+    st.warning("⚠️ Dataset file not found! Please upload or provide the correct path.")
 
 # ✅ Page Title
 st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏋️ Personal Fitness Tracker</h1>", unsafe_allow_html=True)
@@ -81,30 +84,30 @@ if st.sidebar.button("🔥 Predict Calories Burned"):
     if model is not None:
         input_data = [[age, weight, height, steps]]
         prediction = model.predict(input_data)[0]
+
+        # ✅ Activity Recommendation
+        activity_suggestion = ""
+        if steps < 5000:
+            activity_suggestion = "🚶 Try walking 10,000 steps daily for better fitness."
+        elif 5000 <= steps < 10000:
+            activity_suggestion = "🏃 Keep going! Aim for 15,000 steps for optimal fitness."
+        else:
+            activity_suggestion = "🎯 Great job! Maintain your activity level."
+
+        # ✅ Display Results
+        st.markdown(
+            f"""
+            <div style='background-color: rgba(240, 240, 240, 0.9); padding: 20px; border-radius: 10px; text-align: center;'>
+            <h2 style='color: #DC2626;'>🔥 Estimated Calories Burned</h2>
+            <h1 style='color: #B91C1C;'>{round(prediction, 2)} kcal</h1>
+            <p style='color: green; font-size: 18px;'><b>Activity Suggestion:</b> {activity_suggestion}</p>
+            <p style='color: blue; font-size: 18px;'><b>Health Status:</b> {health_status} (BMI: {round(bmi, 2) if bmi is not None else 'N/A'})</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         st.error("⚠️ Model is not trained. Ensure the dataset is loaded correctly.")
-
-    # ✅ Activity Recommendation
-    activity_suggestion = ""
-    if steps < 5000:
-        activity_suggestion = "🚶 Try walking 10,000 steps daily for better fitness."
-    elif 5000 <= steps < 10000:
-        activity_suggestion = "🏃 Keep going! Aim for 15,000 steps for optimal fitness."
-    else:
-        activity_suggestion = "🎯 Great job! Maintain your activity level."
-
-    # ✅ Display Results
-    st.markdown(
-        f"""
-        <div style='background-color: rgba(240, 240, 240, 0.9); padding: 20px; border-radius: 10px; text-align: center;'>
-        <h2 style='color: #DC2626;'>🔥 Estimated Calories Burned</h2>
-        <h1 style='color: #B91C1C;'>{round(prediction, 2) if prediction is not None else 'N/A'} kcal</h1>
-        <p style='color: green; font-size: 18px;'><b>Activity Suggestion:</b> {activity_suggestion}</p>
-        <p style='color: blue; font-size: 18px;'><b>Health Status:</b> {health_status} (BMI: {round(bmi, 2) if bmi is not None else 'N/A'})</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
 # ✅ Goal Setting & Progress Bar
 goal_calories = st.sidebar.number_input("🎯 Set a Daily Calorie Burn Goal:", min_value=100, max_value=5000, value=2500, step=100)
