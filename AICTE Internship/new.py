@@ -27,8 +27,8 @@ def set_background(image_path):
         """
         st.markdown(css, unsafe_allow_html=True)
 
-# Provide a correct path for the background image
-background_image ="AICTE Internship/background_image = fitness_tracker_background.png"
+# ✅ Provide correct path for the background image
+background_image = "AICTE Internship/fitness_tracker_background.png"
 if os.path.exists(background_image):
     set_background(background_image)
 
