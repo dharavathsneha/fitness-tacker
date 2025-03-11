@@ -27,7 +27,7 @@ def set_background(image_path):
         """
         st.markdown(css, unsafe_allow_html=True)
 
-# ✅ Provide correct path for the background image
+# ✅ Correct path for the background image
 background_image = "AICTE Internship/fitness_tracker_background.png"
 if os.path.exists(background_image):
     set_background(background_image)
@@ -35,13 +35,14 @@ if os.path.exists(background_image):
 # ✅ Load Dataset
 file_path = "fitness_tracker_dataset.csv"
 df = None
-model = None  # Ensure model is initialized
+model = None  
+
 try:
     df = pd.read_csv(file_path, encoding="latin-1", on_bad_lines="skip")
     df.columns = df.columns.str.strip()
     df = df.dropna()
     
-    # ✅ Model Training (if dataset is available)
+    # ✅ Model Training
     X = df[['Age', 'Weight_kg', 'Height_cm', 'Daily_Steps']]
     y = df['Calories_Burned']
 
