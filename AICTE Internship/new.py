@@ -4,7 +4,7 @@ import numpy as np
 import base64
 import os
 import datetime
-import plotly.express as px
+#import plotly.express as px
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 
